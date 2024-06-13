@@ -1,0 +1,51 @@
+Approach 1 
+
+HTML Implementation:
+          <input type="text" (input)="validateNumberInput($event)" pattern="\d*" inputmode="numeric" formControlName="gst">
+
+
+
+TypeScript Implementation:
+
+           validateNumberInput(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  const sanitizedValue = input.value.replace(/[^0-9]/g, '');
+  input.value = sanitizedValue;
+
+  // Update the form control value
+  this.entryForm.patchValue({ totalUnit: sanitizedValue }, { emitEvent: false });
+
+  // Trigger validation messages if necessary
+  const control = this.entryForm.get('totalUnit');
+  if (control) {
+    control.setValue(sanitizedValue);
+    control.updateValueAndValidity();
+  }
+} 
+
+
+///////////////////////////////////////////////////////////////
+Approach 2:
+
+HTML Implementation:
+
+
+<input type="text" formControlName="gstNo" required (input)="onInputChange($event)">
+<div *ngIf="gstNo.invalid && (gstNo.dirty || gstNo.touched)" class="error">
+  <div *ngIf="gstNo.errors?.pattern">GSTIN can only contain letters and numbers.</div>
+  <div *ngIf="gstNo.errors?.required">GSTIN is required.</div>
+</div>
+
+
+
+TypeScript Implementation:
+
+
+onInputChange(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  if (/[^a-zA-Z0-9]/.test(input.value)) {
+    this.entryForm.controls['gstNo'].setErrors({ 'pattern': true });
+  } else {
+    this.entryForm.controls['gstNo'].setErrors(null);
+  }
+}
